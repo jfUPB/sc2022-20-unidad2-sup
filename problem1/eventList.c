@@ -6,114 +6,138 @@
 EventList *CreateEventList(void)
 {
     EventList *eventList = malloc(sizeof(EventList));
-    eventList->isEmpty = 1;
-    eventList->head = NULL;
-    eventList->last = NULL;
+    eventList ->isEmpty = 1;
+    eventList ->head = NULL;
+    eventList ->last = NULL;
     return eventList;
 
 }
 
 void DestroyEventList(EventList *this)
 {
-    int i;
-    for (i=0; i<strlen(this); i++){
-        free(this);
-        this++;
-    } 
+    free(this);
 }
 
 Event *SearchEvent(EventList *this, char *name)
 {
     Event *evtTemp = this->head;
-    if (this->isEmpty == 0)
+    if(this->isEmpty == 0)
     {
         while (evtTemp != NULL)
         {
-            if (strcmp(name, evtTemp->eventName) == 0)
+            if(strcmp(name, evtTemp->eventName) == 0)
+            {
                 return evtTemp;
+            }
             evtTemp = evtTemp->next;
         }
     }
     evtTemp = NULL;
     return evtTemp;
+
 }
 
 void AddEvent(EventList *this, Event *event)
 {
-    Event *actEvent = this->head;
-    while (actEvent != NULL)
+    if(this->isEmpty == 1)
     {
-        if (strcmp(event->eventName, actEvent->eventName) == 0)
-        {
-            return;
-        }
-        actEvent = actEvent->next;
-    }
-
-    if (this->isEmpty == 0)
-    {
-        this->last->next = event;
-        this->last = event;
+        this->isEmpty = 0;
+        this->head = event;
+        this->last = event; 
     }
     else
     {
-        this->head = event;
-        this->last = event;
-        this->isEmpty = 0;
+        Event *evtTemp = this->head;
+        
+        while(evtTemp != NULL)
+        {
+            if(strcmp(event->eventName, evtTemp->eventName) == 0)
+            {
+                return;
+            }    
+            evtTemp = evtTemp->next;
+        }
+        this->last->next = event;
+        this->last = event;  
     }
+    
 }
 
 void RemoveEvent(EventList *this, char *name)
 {
     if (this->isEmpty == 0)
-    {
-        Event *actEvent = this->head->next;
-        Event *antEvent = this->head;
-        if (strcmp(name, antEvent->eventName) == 0)
+    {       
+        if(strcmp(name, this->head->eventName) == 0)
         {
-            if (antEvent->next == NULL)
+            Event *evtTemp = this->head;
+            if(this->head->next == NULL)
             {
                 this->head = NULL;
                 this->last = NULL;
                 this->isEmpty = 1;
-                DestroyEvent(antEvent);
+                DestroyEvent(this->head);
             }
             else
             {
-                this->head = actEvent;
-                DestroyEvent(antEvent);
+                this->head = this->head->next;
+                DestroyEvent(evtTemp);
             }
+            
         }
-        while (actEvent != NULL)
+        else if (strcmp(name, this->last->eventName) == 0)
         {
-            if (strcmp(name, actEvent->eventName) == 0)
+            Event *evtTemp = this->head;
+            while (evtTemp->next != NULL)
             {
-                antEvent->next = actEvent->next;
-                if (this->last->next == NULL)
+                if(evtTemp->next->next == NULL)
                 {
-                    this->last = antEvent;
-                    DestroyEvent(actEvent);
+                    this->last = evtTemp->next;
+                    evtTemp->next = NULL;
+                    break;
                 }
+                evtTemp = evtTemp->next;
             }
-            antEvent = actEvent;
-            actEvent = actEvent->next;
+            DestroyEvent(this->last);
         }
+        else 
+        {
+            Event *evtAct = this->head;
+            Event  *evtN = this->head;
+            u_int8_t bool = 0;
+            while (evtAct->next != NULL)
+            {
+                if(strcmp(name, evtAct->next->eventName) == 0)
+                {
+                    evtN = evtAct->next;
+                    evtAct->next = evtAct->next->next;
+                    bool = 1;
+                    break;
+                }
+                evtAct = evtAct->next;
+            }
+            if (bool == 1)
+            {
+                DestroyEvent(evtN);
+            }         
+        }        
     }
 }
 
 void ListEvents(EventList *this)
 {
-    if (this->isEmpty == 0)
-    {
-        Event *actEvent = this->head;
+    Event *actEvent = this->head;
 
-        while (actEvent != NULL)
-        {
-            printf("%s\n", actEvent->eventName);
-            actEvent = actEvent->next;
-        }
-    }
-    else{
+    if(this->isEmpty == 1)
+    {
         printf("empty\n");
+    }
+    else 
+    {
+        printf("%s\n",this->head->eventName);
+        while (actEvent->next != NULL)
+        {
+            actEvent = actEvent->next;
+            printf("%s\n",actEvent->eventName); 
+        }
     }
 }
